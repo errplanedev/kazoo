@@ -1,0 +1,44 @@
+name: build/release
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: get short git hash
+        id: git
+        shell: bash
+        run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: create tag
+        shell: bash
+        run: |
+          git tag kazoo-${{ steps.git.outputs.hash }}
+          git push origin kazoo-${{ steps.git.outputs.hash }}
+
+      - name: build + release electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
+        env:
+          ELECTRON_BUILDER_BUILD_VERSION: kazoo-${{ steps.git.outputs.hash }}
