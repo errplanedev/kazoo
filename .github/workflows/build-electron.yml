@@ -3,7 +3,7 @@ name: Build & Draft Release Electron App
 on:
   push:
     branches:
-      - main # every commit to main
+      - main # every commit triggers
 
 jobs:
   build:
@@ -18,19 +18,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: "bun"
-
-      - name: Install Bun
-        run: |
-          curl -fsSL https://bun.sh/install | bash
-          export PATH="$HOME/.bun/bin:$PATH"
-          bun --version
+          cache: "npm"
 
       - name: Install dependencies
-        run: bun install
+        run: npm install
 
       - name: Build Electron App
-        run: bun run build # electron-builder
+        run: npm run build # make sure this runs electron-builder
 
       - name: Create or Update Draft Release
         id: draft_release
