@@ -1,0 +1,67 @@
+name: Build & Draft Release Electron App
+
+on:
+  push:
+    branches:
+      - main # every commit to main
+
+jobs:
+  build:
+    name: Build Electron App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: "bun"
+
+      - name: Install Bun
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          export PATH="$HOME/.bun/bin:$PATH"
+          bun --version
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Electron App
+        run: bun run build # electron-builder
+
+      - name: Create or Update Draft Release
+        id: draft_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "dev-${{ github.sha }}" # unique per commit
+          draft: true
+          prerelease: true
+          name: "Dev Build ${{ github.sha }}"
+          body: "Automatic dev build for commit `${{ github.sha }}`"
+
+      - name: Upload DMG
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.draft_release.outputs.upload_url }}
+          asset_path: dist/*.dmg
+          asset_name: kazoo-${{ github.sha }}.dmg
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows EXE
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.draft_release.outputs.upload_url }}
+          asset_path: dist/*.exe
+          asset_name: kazoo-${{ github.sha }}.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux AppImage
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.draft_release.outputs.upload_url }}
+          asset_path: dist/*.AppImage
+          asset_name: kazoo-${{ github.sha }}.AppImage
+          asset_content_type: application/octet-stream
