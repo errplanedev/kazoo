@@ -1,0 +1,53 @@
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: inherit;
+    background-color: inherit;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+}
+
+.main {
+    font-family: "JetBrains Mono", monospace;
+    display: flex;
+    height: 100vh;
+}
+
+aside {
+    border-right: 1px solid black;
+    padding: 0.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tool {
+    padding: 1rem;
+}
+
+button,
+input,
+pre,
+textarea {
+    font-family: inherit;
+    border: 1px solid gray;
+    border-radius: 0.25rem;
+    padding: 0.1rem 0.3rem;
+    outline: none;
+    resize: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: lightgray;
+}
