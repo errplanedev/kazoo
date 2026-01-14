@@ -16,22 +16,34 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # full history needed for tagging
 
       - name: setup node
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: get git hash
+      - name: get short git hash
         id: git
         shell: bash
         run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: auto tag commit
+        id: tag
+        shell: bash
+        run: |
+          TAG_NAME=kazoo-${{ steps.git.outputs.hash }}
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
 
       - name: build + release electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
-          args: --publish always
         env:
-          ELECTRON_BUILDER_BUILD_VERSION: kazoo-${{ steps.git.outputs.hash }}
+          ELECTRON_BUILDER_BUILD_VERSION: ${{ steps.tag.outputs.tag }}
