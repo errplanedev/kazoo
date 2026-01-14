@@ -30,11 +30,11 @@ jobs:
         id: draft_release
         uses: ncipollo/release-action@v1
         with:
-          tag: "dev-${{ github.sha }}" # unique per commit
+          tag: "kazoo-${{ github.sha }}" # unique per commit
           draft: true
           prerelease: true
-          name: "Dev Build ${{ github.sha }}"
-          body: "Automatic dev build for commit `${{ github.sha }}`"
+          name: "kazoo ${{ github.sha }}"
+          body: "Automatic build for commit `${{ github.sha }}`"
 
       - name: Upload DMG
         uses: actions/upload-release-asset@v1
